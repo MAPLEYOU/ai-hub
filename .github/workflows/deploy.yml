@@ -5,6 +5,9 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  # ⏰ 每天 UTC 8:00 (北京时间 16:00) 自动运行
+  schedule:
+    - cron: '0 8 * * *'
 
 permissions:
   contents: read
@@ -12,7 +15,39 @@ permissions:
   id-token: write
 
 jobs:
+  # 🔄 第一步：抓取最新资讯
+  fetch-news:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: 📥 Fetch latest AI news
+      run: node scripts/fetch-news.js
+
+    - name: 📤 Commit news data
+      run: |
+        git config user.name "AI Hub Bot"
+        git config user.email "bot@ai-hub.local"
+        git add public/ai-news.json
+        git diff --quiet && git diff --staged --quiet || git commit -m "🤖 chore: Update AI news $(date -u +'%Y-%m-%d %H:%M:%S')"
+        git push
+
+  # 🚀 第二步：构建和部署
   build-and-deploy:
+    needs: fetch-news
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -35,7 +70,6 @@ jobs:
       run: npm run build
 
     - name: Deploy to GitHub Pages
-      if: github.ref == 'refs/heads/main'
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}

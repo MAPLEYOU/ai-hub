@@ -468,8 +468,25 @@ export default {
     const refreshData = async () => {
       loading.value = true
       try {
-        // 模拟API延迟
-        await new Promise(resolve => setTimeout(resolve, 800))
+        // 先尝试从自动生成的 JSON 获取最新数据
+        try {
+          const response = await fetch('/ai-hub/ai-news.json')
+          if (response.ok) {
+            const data = await response.json()
+            // 确保日期格式正确
+            articles.value = data.map(item => ({
+              ...item,
+              date: new Date(item.date)
+            }))
+            console.log(`✅ 成功加载 ${data.length} 条最新资讯`)
+            return
+          }
+        } catch (error) {
+          console.warn('📌 使用本地 Mock 数据:', error.message)
+        }
+
+        // 如果远程数据不可用，使用本地 Mock 数据
+        await new Promise(resolve => setTimeout(resolve, 500))
         articles.value = mockData
       } catch (error) {
         console.error('Failed to fetch data:', error)
