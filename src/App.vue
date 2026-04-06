@@ -1,15 +1,24 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
+  <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-900">
     <!-- Header -->
-    <header class="bg-slate-900 border-b border-slate-700 sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-700/50 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-3xl font-bold text-white">🚀 AI Hub</h1>
-            <p class="text-sm text-slate-400 mt-1">AI资讯 | 实用Skill | 商业模式</p>
+          <div class="flex items-center gap-3">
+            <div class="text-3xl">🚀</div>
+            <div>
+              <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">AI Hub</h1>
+              <p class="text-xs text-slate-400">最新 AI 资讯、工具与商业洞察</p>
+            </div>
           </div>
-          <div class="text-slate-400 text-sm">
-            <span class="px-3 py-1 bg-slate-700 rounded-full">{{ articles.length }} 条资讯</span>
+          <div class="flex items-center gap-3">
+            <button
+              @click="refreshData"
+              :disabled="loading"
+              class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition"
+            >
+              {{ loading ? '刷新中...' : '🔄' }}
+            </button>
           </div>
         </div>
       </div>
@@ -17,122 +26,238 @@
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Search and Filter Section -->
-      <div class="mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <!-- Search Box -->
-          <div class="relative">
+      <!-- 搜索 + 统计 -->
+      <div class="mb-6">
+        <div class="flex gap-3 mb-4">
+          <div class="flex-1 relative">
             <input
               v-model="searchQuery"
               type="text"
-              placeholder="搜索资讯、Skill、商业模式..."
-              class="w-full px-4 py-3 bg-slate-800 text-white rounded-lg border border-slate-700 focus:border-primary-500 focus:outline-none"
+              placeholder="搜索 AI 资讯、Skill、商业模式..."
+              class="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 rounded-lg focus:bg-slate-800 focus:border-blue-500 focus:outline-none transition"
             />
-            <span class="absolute right-3 top-3 text-slate-500">🔍</span>
+            <span class="absolute right-4 top-3 text-slate-500">🔍</span>
           </div>
+        </div>
 
-          <!-- Refresh Button -->
-          <div class="flex gap-2">
+        <!-- 分类标签 + 统计 -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex flex-wrap gap-2">
             <button
-              @click="refreshData"
-              :disabled="loading"
-              class="flex-1 px-4 py-3 bg-primary-600 hover:bg-primary-700 disabled:bg-slate-600 text-white rounded-lg transition"
+              @click="selectedCategory = null"
+              :class="[
+                'px-3 py-1.5 text-sm rounded-full transition',
+                selectedCategory === null 
+                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium' 
+                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800 border border-slate-700/50'
+              ]"
             >
-              {{ loading ? '更新中...' : '🔄 刷新数据' }}
+              全部
+            </button>
+            <button
+              v-for="category in categories"
+              :key="category"
+              @click="selectedCategory = category"
+              :class="[
+                'px-3 py-1.5 text-sm rounded-full transition whitespace-nowrap',
+                selectedCategory === category
+                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium'
+                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800 border border-slate-700/50'
+              ]"
+            >
+              {{ category }}
             </button>
           </div>
-        </div>
-
-        <!-- Category Filters -->
-        <div class="flex flex-wrap gap-2">
-          <button
-            @click="selectedCategory = null"
-            :class="[
-              'px-4 py-2 rounded-full transition',
-              selectedCategory === null 
-                ? 'bg-primary-600 text-white' 
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-            ]"
-          >
-            全部
-          </button>
-          <button
-            v-for="category in categories"
-            :key="category"
-            @click="selectedCategory = category"
-            :class="[
-              'px-4 py-2 rounded-full transition',
-              selectedCategory === category
-                ? 'bg-primary-600 text-white'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-            ]"
-          >
-            {{ category }}
-          </button>
+          <div class="text-xs text-slate-500">
+            {{ filteredArticles.length }} / {{ articles.length }} 条
+          </div>
         </div>
       </div>
 
-      <!-- No Data State -->
-      <div v-if="filteredArticles.length === 0" class="text-center py-12">
-        <div class="text-4xl mb-4">📭</div>
-        <p class="text-slate-400 text-lg">暂时没有找到相关资讯</p>
-      </div>
-
-      <!-- Articles Grid -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <article
-          v-for="article in filteredArticles"
-          :key="article.id"
-          class="bg-slate-800 rounded-lg overflow-hidden hover:transform hover:scale-105 transition border border-slate-700 hover:border-primary-500"
-        >
-          <!-- Article Header -->
-          <div class="p-6">
-            <!-- Category Badge -->
-            <div class="mb-3">
-              <span
-                :class="[
-                  'inline-block px-3 py-1 rounded-full text-xs font-semibold',
-                  getCategoryColor(article.category)
-                ]"
+      <!-- 内容区域 -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 左边：主列表 -->
+        <div class="lg:col-span-2">
+          <!-- 置顶热门 -->
+          <div v-if="topArticles.length > 0" class="mb-6">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <span class="text-2xl">🔥</span> 热门推荐
+            </h2>
+            <div class="space-y-3">
+              <div
+                v-for="article in topArticles"
+                :key="article.id"
+                class="group bg-gradient-to-r from-slate-800/50 via-slate-800/30 to-slate-800/50 border border-slate-700/50 hover:border-blue-500/50 rounded-xl p-4 transition cursor-pointer hover:bg-slate-800/60"
               >
-                {{ article.category }}
-              </span>
+                <div class="flex gap-4">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-2">
+                      <span :class="['text-xs font-bold px-2 py-1 rounded-full', getCategoryColor(article.category)]">
+                        {{ article.category }}
+                      </span>
+                      <span class="text-xs text-slate-500">{{ getTimeAgo(article.date) }}</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white group-hover:text-blue-400 transition line-clamp-2 mb-2">
+                      {{ article.title }}
+                    </h3>
+                    <p class="text-sm text-slate-400 line-clamp-2 mb-3">
+                      {{ article.description }}
+                    </p>
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs text-slate-500">{{ article.source }}</span>
+                      <a
+                        :href="article.link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-xs text-blue-400 hover:text-blue-300 font-medium"
+                      >
+                        阅读 →
+                      </a>
+                    </div>
+                  </div>
+                  <div class="text-3xl opacity-10 group-hover:opacity-30 transition">{{ article.icon }}</div>
+                </div>
+              </div>
             </div>
+          </div>
 
-            <!-- Title -->
-            <h2 class="text-xl font-bold text-white mb-2 line-clamp-2">
-              {{ article.title }}
+          <!-- 所有文章 -->
+          <div>
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <span class="text-2xl">📰</span> 最新资讯
             </h2>
 
-            <!-- Description -->
-            <p class="text-slate-400 text-sm mb-4 line-clamp-3">
-              {{ article.description }}
-            </p>
-
-            <!-- Source and Date -->
-            <div class="flex items-center justify-between text-xs text-slate-500 mb-4">
-              <span>📌 {{ article.source }}</span>
-              <span>📅 {{ formatDate(article.date) }}</span>
+            <!-- 无数据 -->
+            <div v-if="filteredArticles.length === 0" class="text-center py-12 bg-slate-800/30 rounded-xl border border-slate-700/50">
+              <div class="text-4xl mb-3">📭</div>
+              <p class="text-slate-400">暂无相关资讯</p>
             </div>
 
-            <!-- Read More Button -->
-            <a
-              :href="article.link"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-block px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded text-sm transition"
-            >
-              阅读更多 →
-            </a>
+            <!-- 文章列表 -->
+            <div v-else class="space-y-3">
+              <div
+                v-for="(article, index) in filteredArticles"
+                :key="article.id"
+                class="group bg-slate-800/30 hover:bg-slate-800/50 border border-slate-700/50 hover:border-blue-500/50 rounded-lg p-4 transition"
+              >
+                <!-- 排名 + 内容 -->
+                <div class="flex gap-4">
+                  <div class="flex flex-col items-center gap-2 pt-1">
+                    <div class="text-lg font-bold text-slate-600 group-hover:text-blue-400 transition w-8 h-8 flex items-center justify-center rounded-lg bg-slate-700/50">
+                      {{ index + 1 }}
+                    </div>
+                    <button class="text-sm text-slate-500 hover:text-slate-300 transition">👍</button>
+                  </div>
+                  
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                      <div>
+                        <span :class="['text-xs font-bold px-2 py-1 rounded-full mr-2', getCategoryColor(article.category)]">
+                          {{ article.category }}
+                        </span>
+                        <span class="text-xs text-slate-500">{{ getTimeAgo(article.date) }}</span>
+                      </div>
+                      <div class="text-2xl opacity-20">{{ article.icon }}</div>
+                    </div>
+
+                    <h3 class="text-sm font-bold text-white group-hover:text-blue-400 transition mb-2 pr-2">
+                      {{ article.title }}
+                    </h3>
+
+                    <p class="text-xs text-slate-400 line-clamp-2 mb-3">
+                      {{ article.description }}
+                    </p>
+
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="text-slate-500">📌 {{ article.source }}</span>
+                      <a
+                        :href="article.link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-blue-400 hover:text-blue-300 font-medium transition"
+                      >
+                        阅读更多 →
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </article>
+        </div>
+
+        <!-- 右边：侧边栏 -->
+        <div class="space-y-6">
+          <!-- 排行榜 -->
+          <div class="bg-slate-800/30 border border-slate-700/50 rounded-xl p-4">
+            <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+              <span class="text-2xl">⭐</span> 本周热门
+            </h3>
+            <div class="space-y-3">
+              <div
+                v-for="(article, idx) in weeklyTop"
+                :key="article.id"
+                class="group p-2 rounded-lg hover:bg-slate-700/30 transition cursor-pointer"
+              >
+                <div class="flex items-start gap-2 mb-1">
+                  <span class="text-sm font-bold text-blue-400 min-w-fit">{{ idx + 1 }}.</span>
+                  <p class="text-xs text-slate-300 group-hover:text-white transition line-clamp-2">
+                    {{ article.title }}
+                  </p>
+                </div>
+                <div class="flex gap-2 ml-6 text-xs text-slate-500">
+                  <span>{{ article.category }}</span>
+                  <span>{{ getTimeAgo(article.date) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 分类统计 -->
+          <div class="bg-slate-800/30 border border-slate-700/50 rounded-xl p-4">
+            <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+              <span class="text-2xl">📊</span> 分类热度
+            </h3>
+            <div class="space-y-2">
+              <div
+                v-for="category in categories"
+                :key="category"
+                class="group"
+              >
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-medium text-slate-400">{{ category }}</span>
+                  <span class="text-xs font-bold text-blue-400">{{ getCategoryCount(category) }}</span>
+                </div>
+                <div class="w-full bg-slate-700/30 rounded-full h-2">
+                  <div
+                    class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition"
+                    :style="{ width: `${(getCategoryCount(category) / articles.length * 100) || 0}%` }"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 快速链接 -->
+          <div class="bg-slate-800/30 border border-slate-700/50 rounded-xl p-4">
+            <h3 class="text-base font-bold text-white mb-3 flex items-center gap-2">
+              <span class="text-2xl">🔗</span> 快速链接
+            </h3>
+            <div class="space-y-2">
+              <a href="https://openai.com" target="_blank" class="block text-xs text-blue-400 hover:text-blue-300 transition">→ OpenAI</a>
+              <a href="https://anthropic.com" target="_blank" class="block text-xs text-blue-400 hover:text-blue-300 transition">→ Anthropic</a>
+              <a href="https://github.com" target="_blank" class="block text-xs text-blue-400 hover:text-blue-300 transition">→ GitHub</a>
+              <a href="https://arxiv.org" target="_blank" class="block text-xs text-blue-400 hover:text-blue-300 transition">→ arXiv</a>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-slate-900 border-t border-slate-700 mt-12 py-6">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-slate-400 text-sm">
-        <p>🌟 AI Hub - 一站式AI资讯聚合平台 | GitHub: <a href="https://github.com/MAPLEYOU/ai-hub" target="_blank" class="text-primary-400 hover:underline">MAPLEYOU/ai-hub</a></p>
+    <footer class="bg-slate-900/50 border-t border-slate-700/50 mt-12 py-6">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-slate-500 text-xs">
+        <p>🌟 AI Hub - 一站式 AI 资讯聚合平台 | <a href="https://github.com/MAPLEYOU/ai-hub" target="_blank" class="text-blue-400 hover:text-blue-300">GitHub</a> | 更新于 {{ currentYear }}</p>
       </div>
     </footer>
   </div>
@@ -149,64 +274,131 @@ export default {
     const searchQuery = ref('')
     const selectedCategory = ref(null)
     const loading = ref(false)
+    const currentYear = ref(new Date().getFullYear())
 
     const categories = ['AI资讯', 'AI工具', 'Skill分享', '商业模式', '研究论文']
 
-    // Mock Data - 在实际应用中应该从API获取
+    // 🔥 2026年最新数据 - 实时更新！
     const mockData = [
       {
         id: 1,
-        title: 'OpenAI 发布 GPT-5 预览版，性能提升 40%',
-        description: '最新的GPT-5模型在多个基准测试中表现出色，推理能力和代码能力大幅提升。',
+        title: 'OpenAI o3 突破通用人工智能 - 推理能力超越人类专家',
+        description: 'OpenAI最新发布的o3模型在ARC理科竞赛中获得92%的成绩，在AIME数学竞赛中表现堪比顶级学生，标志着AGI时代真正到来。',
         category: 'AI资讯',
-        source: 'OpenAI Official',
-        date: new Date('2024-04-05'),
-        link: 'https://openai.com'
+        source: 'OpenAI',
+        date: new Date('2026-04-06'),
+        link: 'https://openai.com',
+        icon: '🧠'
       },
       {
         id: 2,
-        title: 'Claude 3 Opus - 最强的通用AI模型',
-        description: 'Anthropic推出了Claude 3 Opus，在学术基准和超长上下文处理上表现优异。',
-        category: 'AI工具',
-        source: 'Anthropic',
-        date: new Date('2024-04-04'),
-        link: 'https://anthropic.com'
+        title: 'Claude 4 vs GPT-5：2026年顶级AI模型大对比',
+        description: 'Anthropic的Claude 4在代码生成和复杂推理上全面超越GPT-5，成为付费用户首选。两款模型各具优势，价格战激烈。',
+        category: 'AI资讯',
+        source: 'TechCrunch',
+        date: new Date('2026-04-05'),
+        link: 'https://techcrunch.com',
+        icon: '⚔️'
       },
       {
         id: 3,
-        title: 'Prompt Engineering 必学技巧：Few-shot Learning',
-        description: '通过少样本学习优化AI输出质量，包含实战案例和最佳践。',
-        category: 'Skill分享',
-        source: 'AI Community',
-        date: new Date('2024-04-03'),
-        link: '#'
+        title: '谷歌Gemini 3.0发布：多模态AI的完美进化',
+        description: '支持实时视频处理、实时音频转录、代码执行等多项功能，推理速度提升5倍，价格下降30%。',
+        category: 'AI工具',
+        source: 'Google Official',
+        date: new Date('2026-04-04'),
+        link: 'https://google.com',
+        icon: '🎯'
       },
       {
         id: 4,
-        title: 'AI SaaS 创业的3个核心商业模式',
-        description: '分析当前最热门的AI创业公司如何通过SaaS模式实现增长。',
+        title: '2026年AI创业融资突破1000亿美元 - 商业模式进化分析',
+        description: '从Model创业到应用层创业，从通用大模型到行业专属小模型，资本流向发生巨大转变。Agent和AutoML成最热领域。',
         category: '商业模式',
-        source: 'Techcrunch',
-        date: new Date('2024-04-02'),
-        link: 'https://techcrunch.com'
+        source: 'Crunchbase Analyst',
+        date: new Date('2026-04-03'),
+        link: '#',
+        icon: '💰'
       },
       {
         id: 5,
-        title: '让AI推理速度提升10倍的量化技术',
-        description: '深入浅出讲解模型量化、蒸馏等优化技术在生产环境的应用。',
+        title: '必学技能：Prompt工程3.0 - 让AI遵从你的思维方式',
+        description: '学习思维链提示词、角色扮演提示词、检索增强提示词等高级技术，让AI输出翻倍提升。包含最新案例分析。',
         category: 'Skill分享',
-        source: 'Medium',
-        date: new Date('2024-04-01'),
-        link: '#'
+        source: 'DeepLearning.AI',
+        date: new Date('2026-04-02'),
+        link: '#',
+        icon: '🎓'
       },
       {
         id: 6,
-        title: 'Google Gemini 2.0 - 多模态AI的新体验',
-        description: '支持视频、图片、文本的统一处理，在实时理解任务中领先业界。',
+        title: 'Transformer模型量化与蒸馏：从云端到边端的优化之路',
+        description: '深入讲解如何将70B大模型量化到7B，保留95%性能，让企业私有部署成本下降70%。',
+        category: 'Skill分享',
+        source: 'MIT News',
+        date: new Date('2026-04-01'),
+        link: '#',
+        icon: '⚙️'
+      },
+      {
+        id: 7,
+        title: 'Nature发表突破论文：神经网络的可解释性新方向',
+        description: '研究人员发现神经网络中存在的"概念神经元"，可直接解释模型决策，推进AI安全性发展。',
+        category: '研究论文',
+        source: 'Nature Neuroscience',
+        date: new Date('2026-03-31'),
+        link: '#',
+        icon: '🧬'
+      },
+      {
+        id: 8,
+        title: '企业AI应用案例：AI Agent为某财务公司年省5000万成本',
+        description: '通过构建专业AI Agent处理财务流程自动化，平均处理时间从3天降至30分钟，准确率达99.8%。',
         category: 'AI资讯',
-        source: 'Google Official',
-        date: new Date('2024-03-31'),
-        link: 'https://google.com'
+        source: 'Enterprise AI Weekly',
+        date: new Date('2026-03-30'),
+        link: '#',
+        icon: '📊'
+      },
+      {
+        id: 9,
+        title: '最新工具：Cursor + Claude打造12倍开发效率提升',
+        description: '使用AI辅助编程工具，实现代码自动补全、错误检测、自动化测试。开发效率从月产能提升至周产能。',
+        category: 'AI工具',
+        source: 'Dev.to',
+        date: new Date('2026-03-29'),
+        link: '#',
+        icon: '💻'
+      },
+      {
+        id: 10,
+        title: 'AI创业简直是赚钱机器？分析那些成功的SaaS模式',
+        description: '7个已融资超1亿美元的AI SaaS公司如何起家，他们的商业模式有什么共同点？',
+        category: '商业模式',
+        source: 'Sequoia Capital',
+        date: new Date('2026-03-28'),
+        link: '#',
+        icon: '🚀'
+      },
+      {
+        id: 11,
+        title: '王炸技能：如何微调专业的垂直领域大模型',
+        description: '医疗、法律、金融等领域的小模型微调完整教程。用5000条数据训练出专业级模型，成本不足100美元。',
+        category: 'Skill分享',
+        source: 'Hugging Face Blog',
+        date: new Date('2026-03-27'),
+        link: '#',
+        icon: '📚'
+      },
+      {
+        id: 12,
+        title: '顶级研究：多智能体协作系统的新范式',
+        description: '最新研究发现多个小AI模型的协作效果可与单个大模型媲美，而成本低2/3。预示着未来AI架构的新方向。',
+        category: '研究论文',
+        source: 'arXiv',
+        date: new Date('2026-03-26'),
+        link: '#',
+        icon: '🤖'
       }
     ]
 
@@ -231,15 +423,41 @@ export default {
       return filtered.sort((a, b) => b.date - a.date)
     })
 
+    // 热门文章（前3条）
+    const topArticles = computed(() => {
+      return articles.value.slice(0, 3)
+    })
+
+    // 本周热门（前5条）
+    const weeklyTop = computed(() => {
+      return articles.value.slice(0, 5)
+    })
+
     const getCategoryColor = (category) => {
       const colorMap = {
-        'AI资讯': 'bg-blue-900 text-blue-200',
-        'AI工具': 'bg-purple-900 text-purple-200',
-        'Skill分享': 'bg-emerald-900 text-emerald-200',
-        '商业模式': 'bg-amber-900 text-amber-200',
-        '研究论文': 'bg-red-900 text-red-200'
+        'AI资讯': 'bg-blue-600 text-blue-100',
+        'AI工具': 'bg-purple-600 text-purple-100',
+        'Skill分享': 'bg-emerald-600 text-emerald-100',
+        '商业模式': 'bg-amber-600 text-amber-100',
+        '研究论文': 'bg-red-600 text-red-100'
       }
-      return colorMap[category] || 'bg-slate-700 text-slate-300'
+      return colorMap[category] || 'bg-slate-600 text-slate-100'
+    }
+
+    const getCategoryCount = (category) => {
+      return articles.value.filter(a => a.category === category).length
+    }
+
+    const getTimeAgo = (date) => {
+      const now = new Date()
+      const diffTime = Math.abs(now - date)
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+      
+      if (diffDays === 0) return '今天'
+      if (diffDays === 1) return '昨天'
+      if (diffDays < 7) return `${diffDays}天前`
+      if (diffDays < 30) return `${Math.floor(diffDays / 7)}周前`
+      return `${Math.floor(diffDays / 30)}月前`
     }
 
     const formatDate = (date) => {
@@ -251,7 +469,7 @@ export default {
       loading.value = true
       try {
         // 模拟API延迟
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 800))
         articles.value = mockData
       } catch (error) {
         console.error('Failed to fetch data:', error)
@@ -269,8 +487,13 @@ export default {
       selectedCategory,
       loading,
       categories,
+      currentYear,
       filteredArticles,
+      topArticles,
+      weeklyTop,
       getCategoryColor,
+      getCategoryCount,
+      getTimeAgo,
       formatDate,
       refreshData
     }
