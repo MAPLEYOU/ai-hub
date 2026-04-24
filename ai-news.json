@@ -5,7 +5,7 @@
     "description": "OpenAI最新发布的o3模型在ARC理科竞赛中获得92%的成绩，推理能力突破新高。",
     "category": "AI资讯",
     "source": "OpenAI",
-    "date": "2026-04-22T09:18:07.587Z",
+    "date": "2026-04-23T09:26:02.876Z",
     "link": "https://openai.com",
     "icon": "🧠"
   },
@@ -15,7 +15,7 @@
     "description": "支持实时视频处理、实时音频转录、代码执行等多项功能，推理速度提升5倍。",
     "category": "AI工具",
     "source": "Google Official",
-    "date": "2026-04-22T09:18:07.587Z",
+    "date": "2026-04-23T09:26:02.876Z",
     "link": "https://google.com",
     "icon": "🎯"
   },
@@ -25,57 +25,57 @@
     "description": "从Model创业到应用层创业，资本流向发生巨大转变。Agent和AutoML成最热领域。",
     "category": "商业模式",
     "source": "Crunchbase",
-    "date": "2026-04-22T09:18:07.587Z",
+    "date": "2026-04-23T09:26:02.876Z",
     "link": "#",
     "icon": "💰"
   },
   {
     "id": "github-0",
-    "title": "⭐ AutoGPT - 183662 stars",
+    "title": "⭐ AutoGPT - 183684 stars",
     "description": "AutoGPT is the vision of accessible AI for everyone, to use and to build on. Our mission is to provide the tools, so that you can focus on what matters.",
     "category": "AI工具",
     "source": "GitHub",
-    "date": "2026-04-22T09:18:07.587Z",
+    "date": "2026-04-23T09:26:02.876Z",
     "link": "https://github.com/Significant-Gravitas/AutoGPT",
     "icon": "💻"
   },
   {
     "id": "github-1",
-    "title": "⭐ stable-diffusion-webui - 162536 stars",
+    "title": "⭐ stable-diffusion-webui - 162557 stars",
     "description": "Stable Diffusion web UI",
     "category": "AI工具",
     "source": "GitHub",
-    "date": "2026-04-22T09:18:07.587Z",
+    "date": "2026-04-23T09:26:02.876Z",
     "link": "https://github.com/AUTOMATIC1111/stable-diffusion-webui",
     "icon": "💻"
   },
   {
     "id": "github-2",
-    "title": "⭐ langflow - 147236 stars",
+    "title": "⭐ langflow - 147286 stars",
     "description": "Langflow is a powerful tool for building and deploying AI-powered agents and workflows.",
     "category": "AI工具",
     "source": "GitHub",
-    "date": "2026-04-22T09:18:07.587Z",
+    "date": "2026-04-23T09:26:02.876Z",
     "link": "https://github.com/langflow-ai/langflow",
     "icon": "💻"
   },
   {
     "id": "github-3",
-    "title": "⭐ langchain - 134464 stars",
+    "title": "⭐ langchain - 134596 stars",
     "description": "The agent engineering platform",
     "category": "AI工具",
     "source": "GitHub",
-    "date": "2026-04-22T09:18:07.587Z",
+    "date": "2026-04-23T09:26:02.876Z",
     "link": "https://github.com/langchain-ai/langchain",
     "icon": "💻"
   },
   {
     "id": "github-4",
-    "title": "⭐ open-webui - 133242 stars",
+    "title": "⭐ open-webui - 133549 stars",
     "description": "User-friendly AI Interface (Supports Ollama, OpenAI API, ...)",
     "category": "AI工具",
     "source": "GitHub",
-    "date": "2026-04-22T09:18:07.587Z",
+    "date": "2026-04-23T09:26:02.876Z",
     "link": "https://github.com/open-webui/open-webui",
     "icon": "💻"
   }
