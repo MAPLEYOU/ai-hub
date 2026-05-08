@@ -5,7 +5,7 @@
     "description": "OpenAI最新发布的o3模型在ARC理科竞赛中获得92%的成绩，推理能力突破新高。",
     "category": "AI资讯",
     "source": "OpenAI",
-    "date": "2026-05-07T10:23:39.601Z",
+    "date": "2026-05-08T09:17:42.485Z",
     "link": "https://openai.com",
     "icon": "🧠"
   },
@@ -15,7 +15,7 @@
     "description": "支持实时视频处理、实时音频转录、代码执行等多项功能，推理速度提升5倍。",
     "category": "AI工具",
     "source": "Google Official",
-    "date": "2026-05-07T10:23:39.601Z",
+    "date": "2026-05-08T09:17:42.485Z",
     "link": "https://google.com",
     "icon": "🎯"
   },
@@ -25,57 +25,57 @@
     "description": "从Model创业到应用层创业，资本流向发生巨大转变。Agent和AutoML成最热领域。",
     "category": "商业模式",
     "source": "Crunchbase",
-    "date": "2026-05-07T10:23:39.601Z",
+    "date": "2026-05-08T09:17:42.485Z",
     "link": "#",
     "icon": "💰"
   },
   {
     "id": "github-0",
-    "title": "⭐ AutoGPT - 184044 stars",
+    "title": "⭐ AutoGPT - 184085 stars",
     "description": "AutoGPT is the vision of accessible AI for everyone, to use and to build on. Our mission is to provide the tools, so that you can focus on what matters.",
     "category": "AI工具",
     "source": "GitHub",
-    "date": "2026-05-07T10:22:38.298Z",
+    "date": "2026-05-08T09:17:36.448Z",
     "link": "https://github.com/Significant-Gravitas/AutoGPT",
     "icon": "💻"
   },
   {
     "id": "github-1",
-    "title": "⭐ stable-diffusion-webui - 162755 stars",
+    "title": "⭐ stable-diffusion-webui - 162769 stars",
     "description": "Stable Diffusion web UI",
     "category": "AI工具",
     "source": "GitHub",
-    "date": "2026-05-07T10:22:38.298Z",
+    "date": "2026-05-08T09:17:36.448Z",
     "link": "https://github.com/AUTOMATIC1111/stable-diffusion-webui",
     "icon": "💻"
   },
   {
     "id": "github-2",
-    "title": "⭐ langflow - 147807 stars",
+    "title": "⭐ langflow - 147836 stars",
     "description": "Langflow is a powerful tool for building and deploying AI-powered agents and workflows.",
     "category": "AI工具",
     "source": "GitHub",
-    "date": "2026-05-07T10:22:38.298Z",
+    "date": "2026-05-08T09:17:36.448Z",
     "link": "https://github.com/langflow-ai/langflow",
     "icon": "💻"
   },
   {
     "id": "github-3",
-    "title": "⭐ hermes-agent - 136758 stars",
+    "title": "⭐ hermes-agent - 138321 stars",
     "description": "The agent that grows with you",
     "category": "AI工具",
     "source": "GitHub",
-    "date": "2026-05-07T10:22:38.298Z",
+    "date": "2026-05-08T09:17:36.448Z",
     "link": "https://github.com/NousResearch/hermes-agent",
     "icon": "💻"
   },
   {
     "id": "github-4",
-    "title": "⭐ langchain - 136012 stars",
+    "title": "⭐ langchain - 136116 stars",
     "description": "The agent engineering platform. Available in TypeScript!",
     "category": "AI工具",
     "source": "GitHub",
-    "date": "2026-05-07T10:22:38.298Z",
+    "date": "2026-05-08T09:17:36.448Z",
     "link": "https://github.com/langchain-ai/langchain",
     "icon": "💻"
   }
